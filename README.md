@@ -18,7 +18,7 @@ The two tools described above, as well as an interactive QSO count significance 
 
 All other details, insights, graphs and relevant code are available in the project's Jupyter notebook: QSO_study.ipynb .
 
-*Quick note: scraping all the necessary data takes a very long time, so I will only consider contacts originating in Canada. However, my scraping script can easily handle any of the source countries listed in the dropdown menu on clublog.org.*
+*Quick note: scraping all the necessary data takes a very long time, so I will only consider contacts originating in Canada. However, my scraping script can easily handle any of the source countries listed in the dropdown menu on clublog.org .*
 
 
 
