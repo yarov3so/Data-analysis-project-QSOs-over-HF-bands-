@@ -832,11 +832,16 @@ def make_plot(dest,bands):
     Output('output', 'children'),
     [Input('update-sfi', 'n_intervals')])
 
-def update_sfi(_):
+def update_info(_):
     
     global sfi
+    global month
+    global hour
+    
     sfi=get_sfi()
-
+    month=datetime.now().month
+    hour=datetime.now().hour
+    
 if __name__ == '__main__':
     
     app.run_server(host='0.0.0.0',debug=False,port=10000)
