@@ -355,7 +355,39 @@ app.layout =html.Div([
     
     html.Div(style={'height': '20px'}),
     
-    html.Div([html.H1('QSO Prediction Tools'),html.Div('By yarov3so (VA2ZLT)')],style={'text-align': 'center','margin-bottom':'50px'}),
+    html.Div([html.H1('QSO Prediction Tools'), html.Div(html.Em('For radio amateurs located in Canada')), html.Div('By yarov3so (VA2ZLT)',style={'margin-bottom':'10px'}),
+              
+        dcc.Interval(
+        id='update-time',
+        interval=1000,  
+        n_intervals=0
+    ),
+    
+    html.Div(id='updated-time', style={'textAlign': 'center'}),
+    
+    dcc.Interval(
+    id='update-sfi',
+    interval=3600000,  
+    n_intervals=0
+    ),
+    
+    html.Div(id='updated-sfi', style={'textAlign': 'center'}),
+    
+    dcc.Interval(
+    id='update-hour',
+    interval=3600000,  
+    n_intervals=0
+    ),
+    
+    dcc.Interval(
+    id='update-month',
+    interval=3600000,  
+    n_intervals=0
+    ),
+    
+    ],style={'text-align': 'center','margin-bottom':'30px'}),
+    
+    
     html.Div([
     
     html.Div([
@@ -582,14 +614,6 @@ app.layout =html.Div([
     ],style={'margin': 'auto', 'text-align': 'left',"border": "2px solid black","padding": "20px",'width':'80%','margin-top':'50px','backgroundColor': '#FFFFE0'}),
     
     html.Div(style={'height': '60px'}),
-    
-    dcc.Interval(
-        id='update-sfi',
-        interval=3600000,  
-        n_intervals=0
-    ),
-    
-    html.Div(id='output', style={'textAlign': 'center'}),
     
     ],style={'backgroundColor': '#f0f0f0','height': '100%'})
 
@@ -829,18 +853,54 @@ def make_plot(dest,bands):
     return f'data:image/png;base64,{img_str}'
 
 @app.callback(
-    Output('output', 'children'),
+    Output('updated-time', 'children'),
+    [Input('update-time', 'n_intervals')])
+
+def update_time(_):
+    
+    global time
+    time=datetime.now()
+    
+    return f"Current time in Montreal: {time.strftime('%Y-%m-%d %H:%M:%S')}"
+
+
+@app.callback(
+    [Output('sfi', 'value'),Output('sfi_bd', 'value')],
     [Input('update-sfi', 'n_intervals')])
 
-def update_info(_):
-    
+def update_sfi(_):
     global sfi
-    global month
-    global hour
-    
     sfi=get_sfi()
-    month=datetime.now().month
+    return [sfi,sfi]
+
+@app.callback(
+    Output('updated-sfi','children'),
+    [Input('update-sfi','n_intervals')]
+    )
+
+def update_sfi_text(_):
+    sfi=get_sfi()
+    return f"Current SFI: {sfi} (updated every hour)"
+
+@app.callback(
+    [Output('hour', 'value'),Output('hour_bd', 'value')],
+    [Input('update-hour', 'n_intervals')])
+    
+def update_hour(_):
+    global hour
     hour=datetime.now().hour
+    return [hour,hour]
+
+@app.callback(
+    [Output('month', 'value'),Output('month_bd', 'value')],
+    [Input('update-month', 'n_intervals')])
+    
+def update_month(_):
+    global month
+    month=datetime.now().month
+    names={1:'January',2:'February',3:'March',4:'April',5:'May',6:'June',7:'July',8:'August',9:'September',10:'October',11:'November',12:'December'}
+    month=names[month]
+    return [month,month]
     
 if __name__ == '__main__':
     
