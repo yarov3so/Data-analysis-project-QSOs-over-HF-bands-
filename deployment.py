@@ -19,13 +19,13 @@ import numpy as np
 import statsmodels.api as sm
 from matplotlib import pyplot as plt
 import seaborn as sns 
-from datetime import datetime
 import requests
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
 from io import BytesIO
 import base64
+import time
 
 sns.set()
 
@@ -347,8 +347,8 @@ month_names = {
 11: 'November',
 12: 'December'}
 
-month=month_names[datetime.now().month]
-hour=datetime.now().hour
+month=month_names[time.gmtime().tm_mon]
+hour=time.gmtime().tm_hour
 sfi=get_sfi()
 
 app.layout =html.Div([
@@ -446,7 +446,7 @@ app.layout =html.Div([
                 multi=False)], style={'display': 'flex', 'flex-direction': 'row', 'align-items': 'center', 'justify-content': 'space-between'}),
         
         html.Div([
-            html.H4('Hour:',style={'margin-right': '20px'}),
+            html.H4('Hour (GMT):',style={'margin-right': '20px'}),
             dcc.Dropdown(
                 id='hour',
                 options=[{'label':str(i),'value':i} for i in range(24)],
@@ -524,7 +524,7 @@ app.layout =html.Div([
                 multi=False)], style={'display': 'flex', 'flex-direction': 'row', 'align-items': 'center', 'justify-content': 'space-between'}),
         
         html.Div([
-            html.H4('Hour:',style={'margin-right': '20px'}),
+            html.H4('Hour (GMT):',style={'margin-right': '20px'}),
             dcc.Dropdown(
                 id='hour_bd',
                 options=[{'label':str(i),'value':i} for i in range(24)],
@@ -629,9 +629,9 @@ def best_dest(band=None, month=None, hour=None, tolerance=1, sfi=None, consider_
     if band==None:
         band=input("No band entered! Please enter one of the following bands: 6, 10, 12, 15, 17, 20, 30, 40, 60, 80, 160\n")
     if month==None:
-        month=datetime.now().month
+        month=time.gmtime().tm_mon
     if hour==None:
-        hour=datetime.now().hour
+        hour=time.gmtime().tm_hour
     if sfi==None:
         try:
             sfi=get_sfi()
@@ -729,9 +729,9 @@ def best_dest(band=None, month=None, hour=None, tolerance=1, sfi=None, consider_
 def best_bands(month=None, hour=None, tolerance=1, sfi=None, consider_adjacent_ranges=True, dataset=qso_dataset): # Recommmends the best bands
 
     if month==None:
-        month=datetime.now().month
+        month=time.gmtime().tm_mon
     if hour==None:
-        hour=datetime.now().hour
+        hour=time.gmtime().tm_hour
     if sfi==None:
         try:
             sfi=get_sfi()
@@ -771,7 +771,7 @@ def best_bands(month=None, hour=None, tolerance=1, sfi=None, consider_adjacent_r
     time_range=time_range_maker(hour,tolerance)
     
     if set(time_range) != all_hours:
-        print('    Time (hour):',hour)
+        print('    Time (hour):',hour,'(GMT)')
         print(f'    Tolerance: ±{tolerance}','hours, so filtering for hours:',time_range)
     else:
         print('    No time filter was applied since the the implied time range captures all 24 hours.')
@@ -858,10 +858,10 @@ def make_plot(dest,bands):
 
 def update_time(_):
     
-    global time
-    time=datetime.now()
+    gmt_time = time.gmtime()
+    gmt_formatted = time.strftime('%Y-%m-%d %H:%M:%S', gmt_time)
     
-    return f"Current time in Montreal: {time.strftime('%Y-%m-%d %H:%M:%S')}"
+    return "Current time: ", gmt_formatted, " [GMT]"
 
 
 @app.callback(
@@ -888,7 +888,7 @@ def update_sfi_text(_):
     
 def update_hour(_):
     global hour
-    hour=datetime.now().hour
+    hour=time.gmtime().tm_hour
     return [hour,hour]
 
 @app.callback(
@@ -897,7 +897,7 @@ def update_hour(_):
     
 def update_month(_):
     global month
-    month=datetime.now().month
+    month=time.gmtime().tm_mon
     names={1:'January',2:'February',3:'March',4:'April',5:'May',6:'June',7:'July',8:'August',9:'September',10:'October',11:'November',12:'December'}
     month=names[month]
     return [month,month]
